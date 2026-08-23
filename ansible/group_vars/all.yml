@@ -1,0 +1,6 @@
+---
+wg_easy_host: "178.254.32.121"
+wg_easy_dns: "1.1.1.1, 8.8.8.8"
+
+wg_easy_port: 51822
+wg_easy_web_port: 51821

@@ -1,0 +1,16 @@
+# Secrets / SSH
+id_ed25519*
+*.pem
+*.key
+
+# Environment
+.env
+.env.*
+
+# WireGuard client configs
+wg0.conf
+wireguard/*.conf
+
+# Ansible secrets
+**/vault.yml
+**/vault.yaml
