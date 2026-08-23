@@ -1,22 +1,22 @@
 services:
   wg-easy:
-    image: ghcr.io/wg-easy/wg-easy:14
+    image: "{{ wg_easy_image }}"
     container_name: wg-easy
 
     environment:
       - WG_HOST={{ wg_easy_host }}
       - WG_PORT={{ wg_easy_port }}
       - WG_DEFAULT_DNS={{ wg_easy_dns }}
-
-      # Full-Tunnel: Internet ebenfalls über WireGuard
       - WG_ALLOWED_IPS=0.0.0.0/0, ::/0
 
     volumes:
-      - /volume1/docker/wireguard/Config:/etc/wireguard
+      - "{{ wg_easy_config_dir }}:/etc/wireguard"
 
     ports:
       - "{{ wg_easy_port }}:{{ wg_easy_port }}/udp"
-      - "{{ wg_easy_web_port }}:51821/tcp"
+
+    networks:
+      - "{{ traefik_network }}"
 
     restart: unless-stopped
 
@@ -27,3 +27,18 @@ services:
     sysctls:
       - net.ipv4.ip_forward=1
       - net.ipv4.conf.all.src_valid_mark=1
+
+    labels:
+      - "traefik.enable=true"
+
+      - "traefik.http.routers.wireguard.rule=Host(`{{ wg_easy_admin_host }}`)"
+      - "traefik.http.routers.wireguard.entrypoints=web"
+      - "traefik.http.routers.wireguard.service=wireguard"
+
+      - "traefik.http.services.wireguard.loadbalancer.server.port={{ wg_easy_web_port }}"
+
+      - "traefik.docker.network={{ traefik_network }}"
+
+networks:
+  {{ traefik_network }}:
+    external: true

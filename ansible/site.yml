@@ -91,6 +91,46 @@
         enabled: true
 
     # -------------------------------------------------------------------------
+    # Traefik Netzwerk
+    # -------------------------------------------------------------------------
+    - name: Traefik Docker-Netzwerk anlegen
+      community.docker.docker_network:
+        name: "{{ traefik_network }}"
+        ipam_config:
+          - subnet: "{{ traefik_network_subnet }}"
+        state: present
+
+    # -------------------------------------------------------------------------
+    # Traefik
+    # -------------------------------------------------------------------------
+
+    - name: Traefik Verzeichnis anlegen
+      ansible.builtin.file:
+        path: "{{ traefik_dir }}"
+        state: directory
+        mode: "0755"
+
+    - name: Traefik ACME-Datei anlegen
+      ansible.builtin.file:
+        path: "{{ traefik_dir }}/acme.json"
+        state: touch
+        mode: "0600"
+        modification_time: preserve
+        access_time: preserve
+
+    - name: Traefik Compose-Datei erstellen
+      ansible.builtin.template:
+        src: templates/traefik-compose.yaml.j2
+        dest: "{{ traefik_dir }}/compose.yaml"
+        mode: "0644"
+
+    - name: Traefik starten
+      community.docker.docker_compose_v2:
+        project_src: "{{ traefik_dir }}"
+        state: present
+        pull: missing
+
+    # -------------------------------------------------------------------------
     # wg-easy
     # -------------------------------------------------------------------------
 
@@ -100,20 +140,21 @@
         state: directory
         mode: "0755"
       loop:
-        - /opt/wg-easy
-        - /volume1/docker/wireguard/Config
+        - "{{ wg_easy_dir }}"
+        - "{{ wg_easy_config_dir }}"
 
     - name: wg-easy Compose-Datei erstellen
       ansible.builtin.template:
         src: templates/wg-easy-compose.yaml.j2
-        dest: /opt/wg-easy/compose.yaml
+        dest: "{{ wg_easy_dir }}/compose.yaml"
         mode: "0644"
 
     - name: wg-easy starten
       community.docker.docker_compose_v2:
-        project_src: /opt/wg-easy
+        project_src: "{{ wg_easy_dir }}"
         state: present
         pull: missing
+
     # -------------------------------------------------------------------------
     # Firewall
     # -------------------------------------------------------------------------
@@ -132,7 +173,7 @@
     - name: WireGuard erlauben
       community.general.ufw:
         rule: allow
-        port: "51822"
+        port: "{{ wg_easy_port }}"
         proto: udp
 
     - name: Eingehenden Traffic standardmäßig blockieren
