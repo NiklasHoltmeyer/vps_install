@@ -11,6 +11,7 @@ services:
 
     volumes:
       - "{{ wg_easy_config_dir }}:/etc/wireguard"
+      - "/lib/modules:/lib/modules:ro"
 
     ports:
       - "{{ wg_easy_port }}:{{ wg_easy_port }}/udp"

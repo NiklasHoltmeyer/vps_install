@@ -1,0 +1,15 @@
+﻿# Ansible Vault
+group_vars/all/vault.yml
+
+# Vault password
+vault-password
+.vault-password
+*.vault-password
+
+# Environment
+.env
+.env.*
+
+# SSH / Keys
+*.pem
+*.key

@@ -93,6 +93,7 @@
     # -------------------------------------------------------------------------
     # Traefik Netzwerk
     # -------------------------------------------------------------------------
+
     - name: Traefik Docker-Netzwerk anlegen
       community.docker.docker_network:
         name: "{{ traefik_network }}"
@@ -127,6 +128,31 @@
     - name: Traefik starten
       community.docker.docker_compose_v2:
         project_src: "{{ traefik_dir }}"
+        state: present
+        pull: missing
+
+    # -------------------------------------------------------------------------
+    # Pi-hole
+    # -------------------------------------------------------------------------
+
+    - name: Pi-hole Verzeichnisse anlegen
+      ansible.builtin.file:
+        path: "{{ item }}"
+        state: directory
+        mode: "0755"
+      loop:
+        - "{{ pihole_dir }}"
+        - "{{ pihole_config_dir }}"
+
+    - name: Pi-hole Compose-Datei erstellen
+      ansible.builtin.template:
+        src: templates/pihole-compose.yaml.j2
+        dest: "{{ pihole_dir }}/compose.yaml"
+        mode: "0600"
+
+    - name: Pi-hole starten
+      community.docker.docker_compose_v2:
+        project_src: "{{ pihole_dir }}"
         state: present
         pull: missing
 

@@ -7,27 +7,32 @@
 ### 1. Provider vorbereiten
 
 - [`provider/1blu/prepare-kvm.md`](provider/1blu/prepare-kvm.md)  
-  Leere KVM-Instanz bei 1blu erstellen, Ubuntu-ISO als `boot.iso` hochladen und die Installation über VNC starten.
+  Leere KVM-Instanz bei 1blu erstellen und Ubuntu-Installation vorbereiten.
 
 ### 2. Ubuntu installieren
 
 - [`ubuntu/install-ubuntu.md`](ubuntu/install-ubuntu.md)  
-  Ubuntu 24.04 installieren, Netzwerk konfigurieren, Benutzer anlegen und SSH-Key-Zugriff einrichten.
+  Ubuntu 24.04 installieren, Netzwerk konfigurieren, Benutzer anlegen und SSH einrichten.
 
-### 3. Ansible installieren
+### 3. Ansible einrichten
 
 - [`ansible/install-ansible.md`](ansible/install-ansible.md)  
-  Server vorbereiten, Ansible installieren, Collections aus `requirements.yml` installieren und `site.yml` ausführen.
+  Ansible installieren, Collections und Ansible Vault einrichten und `site.yml` ausführen.
 
 ### 4. WireGuard einrichten
 
 - [`wireguard/configure-client.md`](wireguard/configure-client.md)  
-  Auf wg-easy per SSH-Port-Forwarding zugreifen und WireGuard-Clients für Windows oder Smartphone einrichten.
+  wg-easy öffnen und WireGuard-Clients für Windows oder Smartphone einrichten.
+
+### 5. Pi-hole prüfen
+
+- [`pihole/configure-pihole.md`](pihole/configure-pihole.md)  
+  Pi-hole-Weboberfläche öffnen sowie DNS und Werbeblocker prüfen.
 
 ## Lokale Entwicklungsumgebung
 
 - [`windows-wsl/install-docker.md`](windows-wsl/install-docker.md)  
-  WSL 2 mit Ubuntu 24.04 einrichten, Docker Engine installieren und Docker aus PowerShell verwenden.
+  WSL 2 mit Ubuntu 24.04 und Docker Engine einrichten.
 
 ## Verzeichnisübersicht
 
@@ -35,6 +40,8 @@
 docs/
 ├── ansible/
 │   └── install-ansible.md
+├── pihole/
+│   └── configure-pihole.md
 ├── provider/
 │   └── 1blu/
 │       └── prepare-kvm.md

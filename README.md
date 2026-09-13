@@ -1,6 +1,6 @@
 # VPS Setup
 
-Dokumentation und Ansible-Konfiguration für die Einrichtung eines Ubuntu-VPS, WireGuard und einer lokalen Docker-Umgebung unter WSL.
+Dokumentation und Ansible-Konfiguration für einen Ubuntu-VPS mit Docker, Traefik, WireGuard und Pi-hole.
 
 ## Dokumentation
 
@@ -10,8 +10,9 @@ Die vollständige Übersicht befindet sich unter [`docs/README.md`](docs/README.
 
 1. [1blu KVM-Instanz vorbereiten](docs/provider/1blu/prepare-kvm.md)
 2. [Ubuntu 24.04 auf dem VPS installieren](docs/ubuntu/install-ubuntu.md)
-3. [Ansible auf dem Server installieren](docs/ansible/install-ansible.md)
-4. [WireGuard-Client nach der Ansible-Installation einrichten](docs/wireguard/configure-client.md)
+3. [Ansible und Ansible Vault einrichten](docs/ansible/install-ansible.md)
+4. [WireGuard-Client einrichten](docs/wireguard/configure-client.md)
+5. [Pi-hole einrichten und prüfen](docs/pihole/configure-pihole.md)
 
 ### Lokale Umgebung
 
@@ -21,20 +22,25 @@ Die vollständige Übersicht befindet sich unter [`docs/README.md`](docs/README.
 
 ```text
 .
-├── ansible/                 # Ansible-Konfiguration für den VPS
+├── ansible/
 │   ├── group_vars/
+│   │   └── all/
+│   │       └── vars.yml
 │   ├── inventory/
 │   ├── roles/
 │   ├── templates/
 │   ├── ansible.cfg
 │   ├── requirements.yml
 │   └── site.yml
-├── docs/                    # Installations- und Betriebsdokumentation
+│
+├── docs/
 │   ├── ansible/
+│   ├── pihole/
 │   ├── provider/
 │   ├── ubuntu/
 │   ├── windows-wsl/
 │   └── wireguard/
+│
 ├── .gitattributes
 ├── .gitignore
 └── README.md
@@ -42,11 +48,10 @@ Die vollständige Übersicht befindet sich unter [`docs/README.md`](docs/README.
 
 ## Ansible
 
-Die eigentliche Serverkonfiguration liegt unter [`ansible/`](ansible/).
+Die Serverkonfiguration liegt unter [`ansible/`](ansible/).
 
-Einstiegspunkt:
+Vor der ersten Ausführung müssen Ansible Vault und die lokalen Secrets eingerichtet werden.
 
-```bash
-cd ansible
-ansible-playbook site.yml
-```
+Die vollständige Anleitung befindet sich unter:
+
+[`docs/ansible/install-ansible.md`](docs/ansible/install-ansible.md)

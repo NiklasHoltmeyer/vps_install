@@ -19,13 +19,30 @@ traefik_ip: "172.30.0.2"
 traefik_dir: "/opt/traefik"
 
 # -----------------------------------------------------------------------------
+# Pi-hole
+# -----------------------------------------------------------------------------
+
+pihole_image: "pihole/pihole:latest"
+
+pihole_ip: "172.30.0.3"
+
+pihole_dir: "/opt/pihole"
+pihole_config_dir: "/opt/pihole/etc-pihole"
+
+pihole_admin_host: "pihole.{{ base_domain }}"
+
+pihole_upstream_dns: "1.1.1.1;1.0.0.1"
+
+# -----------------------------------------------------------------------------
 # WireGuard / wg-easy
 # -----------------------------------------------------------------------------
 
 wg_easy_image: "ghcr.io/wg-easy/wg-easy:14"
 
 wg_easy_host: "{{ server_ip }}"
-wg_easy_dns: "1.1.1.1, 8.8.8.8"
+
+# Pi-hole als DNS für alle WireGuard-Clients
+wg_easy_dns: "{{ pihole_ip }}"
 
 wg_easy_port: 51822
 wg_easy_web_port: 51821
