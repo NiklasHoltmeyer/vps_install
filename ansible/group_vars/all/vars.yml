@@ -3,8 +3,12 @@
 # Allgemein
 # -----------------------------------------------------------------------------
 
-server_ip: "178.254.32.121"
+# Auf einem normalen VPS ist dies die öffentliche IPv4 am Default-Interface.
+server_ip: "{{ ansible_default_ipv4.address }}"
 base_domain: "home.arpa"
+
+# Gemeinsames internes Docker-Netz für Traefik, Pi-hole und wg-easy.
+services_network_subnet: "172.30.0.0/24"
 
 # -----------------------------------------------------------------------------
 # Traefik
@@ -13,7 +17,7 @@ base_domain: "home.arpa"
 traefik_image: "traefik:v3.7.10"
 
 traefik_network: "traefik"
-traefik_network_subnet: "172.30.0.0/24"
+traefik_network_subnet: "{{ services_network_subnet }}"
 traefik_ip: "172.30.0.2"
 
 traefik_dir: "/opt/traefik"
@@ -40,12 +44,21 @@ pihole_upstream_dns: "1.1.1.1;1.0.0.1"
 wg_easy_image: "ghcr.io/wg-easy/wg-easy:14"
 
 wg_easy_host: "{{ server_ip }}"
+wg_easy_ip: "172.30.0.4"
 
 # Pi-hole als DNS für alle WireGuard-Clients
 wg_easy_dns: "{{ pihole_ip }}"
 
+# WireGuard-Clientnetz; wg-easy v14 erwartet hier ein x als Host-Platzhalter.
+wg_easy_default_address: "10.8.0.x"
+wg_easy_tunnel_subnet: "10.8.0.0/24"
+
+# Standard = Split-Tunnel: nur WireGuard- und interne VPS-Netze durch den Tunnel.
+wg_easy_allowed_ips: "{{ wg_easy_tunnel_subnet }}, {{ services_network_subnet }}"
+
 wg_easy_port: 51822
 wg_easy_web_port: 51821
+wg_easy_web_bind_ip: "127.0.0.1"
 
 wg_easy_dir: "/opt/wg-easy"
 wg_easy_config_dir: "/volume1/docker/wireguard/Config"

@@ -22,7 +22,7 @@
 ### 4. WireGuard einrichten
 
 - [`wireguard/configure-client.md`](wireguard/configure-client.md)  
-  wg-easy öffnen und WireGuard-Clients für Windows oder Smartphone einrichten.
+  Split-Tunnel- und Full-VPN-Clients für Windows oder Smartphone einrichten.
 
 ### 5. Pi-hole prüfen
 

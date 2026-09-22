@@ -1,180 +1,113 @@
-# WireGuard nach Ansible-Installation einrichten
+# WireGuard-Clients einrichten
+
+Split-Tunnel schickt nur interne VPS-Netze durch WireGuard, Full-VPN schickt den gesamten Internetverkehr durch den VPS.
 
 ## 1. wg-easy öffnen
 
-SSH-Verbindung mit lokalem Port-Forwarding aufbauen:
+Auf dem eigenen Rechner:
 
 ```powershell
 ssh -L 51821:127.0.0.1:51821 -i "$HOME\.ssh\id_ed25519_vps" USER@SERVER_IP
 ```
 
-Danach im Browser öffnen:
+Dann öffnen:
 
 ```text
 http://localhost:51821
 ```
 
-Der Port `51821` ist nur lokal auf dem VPS erreichbar und wird über SSH weitergeleitet.
-
-## 2. Client erstellen
+## 2. Split-Tunnel-Client anlegen
 
 In wg-easy:
 
 ```text
 New Client
-→ Namen vergeben
-→ Konfiguration herunterladen oder QR-Code anzeigen
+→ z. B. windows-split
+→ Konfiguration herunterladen / QR-Code anzeigen
 ```
 
-Die Client-Konfiguration sollte enthalten:
+Die erzeugte Konfiguration soll enthalten:
 
 ```ini
 [Interface]
 DNS = 172.30.0.3
 
 [Peer]
-AllowedIPs = 0.0.0.0/0, ::/0
+AllowedIPs = 10.8.0.0/24, 172.30.0.0/24
 Endpoint = SERVER_IP:51822
 ```
 
-`172.30.0.3` ist der Pi-hole-DNS-Server.
+Importieren und aktivieren.
 
-## 3. Windows
+## 3. Full-VPN-Client anlegen
 
-WireGuard installieren:
+In wg-easy einen separaten Client anlegen:
 
 ```text
-https://www.wireguard.com/install/
+New Client
+→ z. B. phone-full
+→ Konfiguration herunterladen
 ```
 
-Dann:
+In der heruntergeladenen `.conf` nur diese Zeile ändern:
+
+```ini
+AllowedIPs = 0.0.0.0/0, ::/0
+```
+
+Danach importieren; eine zweite WireGuard-Instanz auf dem VPS ist nicht nötig.
+
+> Bei erneutem Download der Full-VPN-Konfiguration muss `AllowedIPs` erneut angepasst werden, weil wg-easy v14 den Split-Tunnel als globalen Standard erzeugt.
+
+## 4. Windows
 
 ```text
-Add Tunnel
+WireGuard
+→ Add Tunnel
 → Import tunnel(s) from file
 → .conf auswählen
 → Activate
 ```
 
-## 4. Smartphone
-
-WireGuard-App installieren.
-
-Dann:
+## 5. Smartphone
 
 ```text
-Add Tunnel
-→ Scan from QR code
+WireGuard-App
+→ Add Tunnel
+→ QR-Code scannen oder .conf importieren
 ```
 
-oder die `.conf` importieren.
+Für das Handy kannst du z. B. zwei Profile behalten:
 
-Anschließend Tunnel aktivieren.
+```text
+phone-split
+phone-full
+```
 
-## 5. Verbindung prüfen
+## 6. Prüfen
 
-Auf dem Server:
+Auf dem VPS:
 
 ```bash
 docker exec wg-easy wg show
 ```
 
-Bei einem verbundenen Client sollte ein aktueller Handshake erscheinen:
-
-```text
-latest handshake: ... seconds ago
-transfer: ... received, ... sent
-```
-
-Auf dem Client:
-
-```powershell
-ping 10.8.0.1
-```
-
-Danach:
-
-```powershell
-ping 1.1.1.1
-```
-
-DNS über Pi-hole prüfen:
+Split-Tunnel:
 
 ```powershell
 nslookup google.de 172.30.0.3
 ```
 
-## 6. Öffentliche IP prüfen
+Full-VPN: öffentliche IP prüfen; sie sollte der VPS-IP entsprechen.
 
-Da
-
-```ini
-AllowedIPs = 0.0.0.0/0, ::/0
-```
-
-gesetzt ist, läuft der Internetverkehr über den VPS.
-
-WireGuard aktivieren und anschließend die öffentliche IPv4-Adresse prüfen.
-
-Sie sollte der öffentlichen IPv4-Adresse des VPS entsprechen.
-
-## 7. Server-Konfiguration prüfen
-
-```bash
-docker exec wg-easy cat /etc/wireguard/wg0.conf
-```
-
-Wichtig:
-
-```ini
-ListenPort = 51822
-```
-
-Portfluss:
-
-```text
-Internet
-    ↓ UDP 51822
-VPS
-    ↓
-Docker 51822 → 51822
-    ↓
-wg-easy
-```
-
-Die Client-Konfiguration verwendet:
-
-```ini
-Endpoint = SERVER_IP:51822
-```
-
-## 8. Firewall prüfen
-
-```bash
-sudo ufw status
-```
-
-Erwartet:
-
-```text
-22/tcp       ALLOW
-51822/udp    ALLOW
-```
-
-Port `51821` wird nicht öffentlich freigegeben.
-
-## 9. Nach Änderungen
+## 7. Nach Ansible-Änderungen
 
 ```bash
 cd /opt/wg-easy
 docker compose up -d
-```
 
-Danach:
-
-```bash
 docker compose ps
 docker exec wg-easy wg show
 ```
 
-Wenn DNS, `WG_PORT`, `WG_ALLOWED_IPS` oder andere Client-Einstellungen geändert wurden, eine neue Client-Konfiguration herunterladen bzw. den QR-Code erneut einscannen.
+Bestehende Clients übernehmen Änderungen an `WG_DEFAULT_DNS` oder `WG_ALLOWED_IPS` nicht automatisch und müssen neu heruntergeladen oder manuell angepasst werden.

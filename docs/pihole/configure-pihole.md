@@ -26,10 +26,14 @@ Pi-hole verwendet im Docker-Netz:
 172.30.0.3
 ```
 
-Ein WireGuard-Client sollte folgende Einstellung besitzen:
+Ein Split-Tunnel-Client sollte enthalten:
 
 ```ini
+[Interface]
 DNS = 172.30.0.3
+
+[Peer]
+AllowedIPs = 10.8.0.0/24, 172.30.0.0/24
 ```
 
 Auf dem Client testen:
@@ -40,19 +44,15 @@ nslookup google.de 172.30.0.3
 
 > **Wichtig bei bestehenden WireGuard-Clients**
 >
-> Bereits vorhandene Clients übernehmen eine Änderung von `WG_DEFAULT_DNS` nicht automatisch.
+> Bereits vorhandene Clients übernehmen Änderungen von `WG_DEFAULT_DNS` oder `WG_ALLOWED_IPS` nicht automatisch.
 >
-> Falls dort noch beispielsweise `1.1.1.1` eingetragen ist, muss die Client-Konfiguration neu heruntergeladen bzw. der QR-Code neu eingescannt werden.
->
-> Alternativ kann `DNS` im bestehenden Tunnel manuell auf `172.30.0.3` geändert werden.
->
-> Anschließend den WireGuard-Tunnel einmal deaktivieren und erneut aktivieren.
+> Konfiguration neu herunterladen bzw. QR-Code neu einscannen oder die Werte im bestehenden Tunnel manuell anpassen.
 
 ## 3. Weboberfläche öffnen
 
 WireGuard verbinden.
 
-Danach im Browser:
+Danach im Browser öffnen:
 
 ```text
 http://pihole.home.arpa/admin/
@@ -76,11 +76,6 @@ Test:
 
 ```powershell
 nslookup pihole.home.arpa
-```
-
-und:
-
-```powershell
 nslookup wireguard.home.arpa
 ```
 
@@ -110,15 +105,9 @@ Nach einer Änderung:
 
 ```bash
 cd /opt/pihole
-
 docker compose pull
-
 docker compose up -d
-```
 
-Status prüfen:
-
-```bash
 docker compose ps
 ```
 
