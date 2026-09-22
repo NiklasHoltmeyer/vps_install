@@ -6,8 +6,9 @@ services:
     environment:
       - WG_HOST={{ wg_easy_host }}
       - WG_PORT={{ wg_easy_port }}
+      - WG_DEFAULT_ADDRESS={{ wg_easy_default_address }}
       - WG_DEFAULT_DNS={{ wg_easy_dns }}
-      - WG_ALLOWED_IPS=0.0.0.0/0, ::/0
+      - WG_ALLOWED_IPS={{ wg_easy_allowed_ips }}
 
     volumes:
       - "{{ wg_easy_config_dir }}:/etc/wireguard"
@@ -15,9 +16,11 @@ services:
 
     ports:
       - "{{ wg_easy_port }}:{{ wg_easy_port }}/udp"
+      - "{{ wg_easy_web_bind_ip }}:{{ wg_easy_web_port }}:{{ wg_easy_web_port }}/tcp"
 
     networks:
-      - "{{ traefik_network }}"
+      {{ traefik_network }}:
+        ipv4_address: "{{ wg_easy_ip }}"
 
     restart: unless-stopped
 
