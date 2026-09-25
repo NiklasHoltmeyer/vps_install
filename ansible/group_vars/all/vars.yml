@@ -88,7 +88,7 @@ vikunja_db_user: "vikunja"
 # Homepage Dashboard
 # -----------------------------------------------------------------------------
 
-homepage_image: "ghcr.io/gethomepage/homepage:latest"
+homepage_image: "ghcr.io/gethomepage/homepage:v2.4.0"
 homepage_status_image: "busybox:1.37"
 homepage_ip: "172.30.0.6"
 
