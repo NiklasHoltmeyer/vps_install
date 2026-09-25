@@ -9,8 +9,6 @@ services:
       VIKUNJA_SERVICE_SECRET: "{{ vikunja_service_secret }}"
       VIKUNJA_SERVICE_TIMEZONE: "{{ timezone }}"
       VIKUNJA_SERVICE_ENABLEREGISTRATION: "{{ vikunja_registration_enabled | string | lower }}"
-      VIKUNJA_SERVICE_IPEXTRACTIONMETHOD: "xff"
-      VIKUNJA_SERVICE_TRUSTEDPROXIES: "{{ traefik_network_subnet }}"
       VIKUNJA_DATABASE_TYPE: "postgres"
       VIKUNJA_DATABASE_HOST: "db"
       VIKUNJA_DATABASE_DATABASE: "{{ vikunja_db_name }}"
