@@ -83,3 +83,21 @@ vikunja_registration_enabled: true
 
 vikunja_db_name: "vikunja"
 vikunja_db_user: "vikunja"
+
+# -----------------------------------------------------------------------------
+# Homepage Dashboard
+# -----------------------------------------------------------------------------
+
+homepage_image: "ghcr.io/gethomepage/homepage:v2.4.0"
+homepage_status_image: "busybox:1.37"
+homepage_ip: "172.30.0.6"
+
+homepage_dir: "/opt/homepage"
+homepage_config_dir: "{{ homepage_dir }}/config"
+homepage_status_dir: "{{ homepage_dir }}/status"
+
+homepage_host: "dashboard.{{ base_domain }}"
+homepage_port: 3000
+homepage_status_port: 8080
+homepage_puid: 1000
+homepage_pgid: 1000

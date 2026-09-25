@@ -1,0 +1,55 @@
+---
+- Anwendungen:
+    - Vikunja:
+        icon: vikunja.png
+        href: "http://{{ vikunja_host }}"
+        description: Aufgaben und Projekte
+        siteMonitor: "http://vikunja:3456"
+
+- Infrastruktur:
+    - Pi-hole:
+        icon: pi-hole.png
+        href: "http://{{ pihole_admin_host }}/admin/"
+        description: DNS und Werbeblocker
+        siteMonitor: "http://pihole/admin/"
+
+    - WireGuard:
+        icon: wireguard.png
+        href: "http://{{ wg_easy_admin_host }}"
+        description: VPN Verwaltung
+        siteMonitor: "http://wg-easy:{{ wg_easy_web_port }}"
+
+- Systemstatus:
+    - Docker:
+        icon: docker.png
+        description: Reduzierter Containerstatus ohne Docker-Socket im Dashboard
+        widget:
+          type: customapi
+          url: "http://homepage-status:{{ homepage_status_port }}/status.json"
+          refreshInterval: 30000
+          mappings:
+            - field: total
+              label: Container
+              format: number
+            - field: running
+              label: Running
+              format: number
+            - field: healthy
+              label: Healthy
+              format: number
+            - field: problems
+              label: Probleme
+              format: number
+
+    - Docker Probleme:
+        icon: mdi-alert-circle-outline
+        description: Gestoppte oder unhealthy Container
+        widget:
+          type: customapi
+          url: "http://homepage-status:{{ homepage_status_port }}/status.json"
+          refreshInterval: 30000
+          display: dynamic-list
+          mappings:
+            items: problem_containers
+            name: name
+            label: status

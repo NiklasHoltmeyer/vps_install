@@ -1,0 +1,55 @@
+services:
+  homepage:
+    image: "{{ homepage_image }}"
+    container_name: homepage
+    restart: unless-stopped
+
+    environment:
+      HOMEPAGE_ALLOWED_HOSTS: "{{ homepage_host }}"
+      LOG_TARGETS: "stdout"
+      PUID: "{{ homepage_puid }}"
+      PGID: "{{ homepage_pgid }}"
+
+    volumes:
+      - "{{ homepage_config_dir }}:/app/config"
+
+    networks:
+      {{ traefik_network }}:
+        ipv4_address: "{{ homepage_ip }}"
+      homepage_backend:
+
+    security_opt:
+      - no-new-privileges:true
+
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.homepage.rule=Host(`{{ homepage_host }}`)"
+      - "traefik.http.routers.homepage.entrypoints=web"
+      - "traefik.http.routers.homepage.service=homepage"
+      - "traefik.http.services.homepage.loadbalancer.server.port={{ homepage_port }}"
+      - "traefik.docker.network={{ traefik_network }}"
+
+  status:
+    image: "{{ homepage_status_image }}"
+    container_name: homepage-status
+    restart: unless-stopped
+    user: "65534:65534"
+    command: ["httpd", "-f", "-p", "{{ homepage_status_port }}", "-h", "/status"]
+
+    volumes:
+      - "{{ homepage_status_dir }}:/status:ro"
+
+    networks:
+      - homepage_backend
+
+    read_only: true
+    cap_drop:
+      - ALL
+    security_opt:
+      - no-new-privileges:true
+
+networks:
+  {{ traefik_network }}:
+    external: true
+  homepage_backend:
+    internal: true

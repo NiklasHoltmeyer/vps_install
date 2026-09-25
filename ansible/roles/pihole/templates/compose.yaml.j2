@@ -15,6 +15,7 @@ services:
         {{ traefik_ip }} {{ pihole_admin_host }}
         {{ traefik_ip }} {{ wg_easy_admin_host }}
         {{ traefik_ip }} {{ vikunja_host }}
+        {{ traefik_ip }} {{ homepage_host }}
 
     volumes:
       - "{{ pihole_config_dir }}:/etc/pihole"

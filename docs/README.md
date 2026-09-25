@@ -36,6 +36,11 @@
 - [`vikunja/backup-vikunja.md`](vikunja/backup-vikunja.md)  
   PostgreSQL-Datenbank und Vikunja-Dateien sichern und wiederherstellen.
 
+### 7. Dashboard einrichten
+
+- [`homepage/configure-homepage.md`](homepage/configure-homepage.md)  
+  Zentrales Homepage-Dashboard, Web-UI-Links und sicheren Docker-Systemstatus prüfen.
+
 ## Dienste
 
 - [`services.md`](services.md)  
@@ -52,6 +57,8 @@
 docs/
 ├── ansible/
 │   └── install-ansible.md
+├── homepage/
+│   └── configure-homepage.md
 ├── pihole/
 │   └── configure-pihole.md
 ├── provider/

@@ -1,0 +1,11 @@
+[Unit]
+Description=Refresh sanitized Docker health data for Homepage
+
+[Timer]
+OnBootSec=30s
+OnUnitActiveSec=30s
+AccuracySec=5s
+Persistent=true
+
+[Install]
+WantedBy=timers.target

@@ -1,6 +1,6 @@
 # VPS Setup
 
-Dokumentation und Ansible-Konfiguration für einen Ubuntu-VPS mit Docker, Traefik, WireGuard, Pi-hole und Vikunja.
+Dokumentation und Ansible-Konfiguration für einen Ubuntu-VPS mit Docker, Traefik, WireGuard, Pi-hole, Vikunja und Homepage.
 
 ## Dokumentation
 
@@ -14,8 +14,15 @@ Die vollständige Übersicht befindet sich unter [`docs/README.md`](docs/README.
 4. [WireGuard-Clients einrichten](docs/wireguard/configure-client.md)
 5. [Pi-hole einrichten und prüfen](docs/pihole/configure-pihole.md)
 6. [Vikunja einrichten und prüfen](docs/vikunja/configure-vikunja.md)
+7. [Homepage Dashboard einrichten und prüfen](docs/homepage/configure-homepage.md)
 
 Die zentrale Übersicht aller Dienste und Zugriffe befindet sich unter [`docs/services.md`](docs/services.md).
+
+Nach Verbindung mit WireGuard ist das zentrale Dashboard erreichbar unter:
+
+```text
+http://dashboard.home.arpa
+```
 
 ### Lokale Umgebung
 
@@ -38,6 +45,7 @@ Kurzanleitung: [`docs/wireguard/configure-client.md`](docs/wireguard/configure-c
 │   ├── inventory/
 │   ├── roles/
 │   │   ├── base/
+│   │   ├── homepage/
 │   │   ├── pihole/
 │   │   ├── traefik/
 │   │   ├── vikunja/
@@ -48,6 +56,7 @@ Kurzanleitung: [`docs/wireguard/configure-client.md`](docs/wireguard/configure-c
 │
 ├── docs/
 │   ├── ansible/
+│   ├── homepage/
 │   ├── pihole/
 │   ├── provider/
 │   ├── ubuntu/
