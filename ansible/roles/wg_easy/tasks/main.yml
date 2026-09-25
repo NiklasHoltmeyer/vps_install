@@ -1,0 +1,21 @@
+---
+- name: wg-easy Verzeichnisse anlegen
+  ansible.builtin.file:
+    path: "{{ item }}"
+    state: directory
+    mode: "0755"
+  loop:
+    - "{{ wg_easy_dir }}"
+    - "{{ wg_easy_config_dir }}"
+
+- name: wg-easy Compose-Datei erstellen
+  ansible.builtin.template:
+    src: compose.yaml.j2
+    dest: "{{ wg_easy_dir }}/compose.yaml"
+    mode: "0644"
+
+- name: wg-easy starten
+  community.docker.docker_compose_v2:
+    project_src: "{{ wg_easy_dir }}"
+    state: present
+    pull: missing

@@ -1,4 +1,4 @@
-﻿services:
+services:
   pihole:
     image: "{{ pihole_image }}"
     container_name: pihole
@@ -6,17 +6,15 @@
     restart: unless-stopped
 
     environment:
-      TZ: "Europe/Berlin"
-
+      TZ: "{{ timezone }}"
       FTLCONF_webserver_api_password: "{{ pihole_password }}"
       FTLCONF_webserver_domain: "{{ pihole_admin_host }}"
-
       FTLCONF_dns_listeningMode: "ALL"
       FTLCONF_dns_upstreams: "{{ pihole_upstream_dns }}"
-
       FTLCONF_dns_hosts: |-
         {{ traefik_ip }} {{ pihole_admin_host }}
         {{ traefik_ip }} {{ wg_easy_admin_host }}
+        {{ traefik_ip }} {{ vikunja_host }}
 
     volumes:
       - "{{ pihole_config_dir }}:/etc/pihole"
@@ -27,13 +25,10 @@
 
     labels:
       - "traefik.enable=true"
-
       - "traefik.http.routers.pihole.rule=Host(`{{ pihole_admin_host }}`)"
       - "traefik.http.routers.pihole.entrypoints=web"
       - "traefik.http.routers.pihole.service=pihole"
-
       - "traefik.http.services.pihole.loadbalancer.server.port=80"
-
       - "traefik.docker.network={{ traefik_network }}"
 
 networks:

@@ -17,7 +17,7 @@
 ### 3. Ansible einrichten
 
 - [`ansible/install-ansible.md`](ansible/install-ansible.md)  
-  Ansible installieren, Collections und Ansible Vault einrichten und `site.yml` ausführen.
+  Ansible installieren, Collections, Ansible Vault und die benötigten Secrets einrichten und `site.yml` ausführen.
 
 ### 4. WireGuard einrichten
 
@@ -28,6 +28,18 @@
 
 - [`pihole/configure-pihole.md`](pihole/configure-pihole.md)  
   Pi-hole-Weboberfläche öffnen sowie DNS und Werbeblocker prüfen.
+
+### 6. Vikunja einrichten
+
+- [`vikunja/configure-vikunja.md`](vikunja/configure-vikunja.md)  
+  Vikunja prüfen, ersten Benutzer anlegen und Clientzugriff konfigurieren.
+- [`vikunja/backup-vikunja.md`](vikunja/backup-vikunja.md)  
+  PostgreSQL-Datenbank und Vikunja-Dateien sichern und wiederherstellen.
+
+## Dienste
+
+- [`services.md`](services.md)  
+  Übersicht aller Dienste, internen Namen, Ports, IP-Adressen und persistenten Datenpfade.
 
 ## Lokale Entwicklungsumgebung
 
@@ -47,9 +59,13 @@ docs/
 │       └── prepare-kvm.md
 ├── ubuntu/
 │   └── install-ubuntu.md
+├── vikunja/
+│   ├── backup-vikunja.md
+│   └── configure-vikunja.md
 ├── windows-wsl/
 │   └── install-docker.md
 ├── wireguard/
 │   └── configure-client.md
+├── services.md
 └── README.md
 ```

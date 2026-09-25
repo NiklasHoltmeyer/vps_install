@@ -73,31 +73,29 @@ und darf niemals ins Git-Repository eingecheckt werden.
 
 ## 6. Secrets erzeugen
 
-Pi-hole-Passwort generieren:
+Secrets generieren:
 
 ```bash
 PIHOLE_PASSWORD="$(openssl rand -base64 32 | tr -d '\n')"
-```
-
-Optional anzeigen:
-
-```bash
-echo "$PIHOLE_PASSWORD"
+VIKUNJA_DB_PASSWORD="$(openssl rand -base64 32 | tr -d '\n')"
+VIKUNJA_SERVICE_SECRET="$(openssl rand -base64 48 | tr -d '\n')"
 ```
 
 Lokale `vault.yml` erstellen:
 
 ```bash
-printf '%s\n' \
-  '---' \
-  "pihole_password: \"$PIHOLE_PASSWORD\"" \
-  > group_vars/all/vault.yml
+cat > group_vars/all/vault.yml <<EOF
+---
+pihole_password: "$PIHOLE_PASSWORD"
+vikunja_db_password: "$VIKUNJA_DB_PASSWORD"
+vikunja_service_secret: "$VIKUNJA_SERVICE_SECRET"
+EOF
 ```
 
-Variable wieder aus der Shell entfernen:
+Variablen wieder aus der Shell entfernen:
 
 ```bash
-unset PIHOLE_PASSWORD
+unset PIHOLE_PASSWORD VIKUNJA_DB_PASSWORD VIKUNJA_SERVICE_SECRET
 ```
 
 ## 7. `vault.yml` verschlüsseln
@@ -136,7 +134,13 @@ ansible-vault view \
   --vault-password-file ~/.ansible/vault-password
 ```
 
-Die entschlüsselten Variablen sollten angezeigt werden.
+Erwartete Variablen:
+
+```yaml
+pihole_password: "..."
+vikunja_db_password: "..."
+vikunja_service_secret: "..."
+```
 
 ## 9. Konfiguration prüfen
 
@@ -159,21 +163,10 @@ ansible-playbook \
 
 ## 11. Secrets bearbeiten
 
-Die lokale Vault-Datei bearbeiten:
-
 ```bash
 ansible-vault edit \
   group_vars/all/vault.yml \
   --vault-password-file ~/.ansible/vault-password
-```
-
-Beispiel:
-
-```yaml
----
-pihole_password: "..."
-nextcloud_admin_password: "..."
-nextcloud_db_password: "..."
 ```
 
 ## 12. Wichtig
@@ -187,4 +180,4 @@ group_vars/all/vault.yml
 
 `group_vars/all/vault.yml` ist über `.gitignore` ausgeschlossen.
 
-Bei einer vollständigen Neuinstallation werden Vault-Key und Secrets neu generiert.
+Bei einer vollständigen Neuinstallation werden Vault-Key und Secrets neu generiert oder aus einem sicheren Backup wiederhergestellt.

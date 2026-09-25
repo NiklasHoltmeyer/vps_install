@@ -6,8 +6,9 @@
 # Auf einem normalen VPS ist dies die öffentliche IPv4 am Default-Interface.
 server_ip: "{{ ansible_facts['default_ipv4']['address'] }}"
 base_domain: "home.arpa"
+timezone: "Europe/Berlin"
 
-# Gemeinsames internes Docker-Netz für Traefik, Pi-hole und wg-easy.
+# Gemeinsames internes Docker-Netz für Traefik und die darüber erreichbaren Dienste.
 services_network_subnet: "172.30.0.0/24"
 
 # -----------------------------------------------------------------------------
@@ -34,7 +35,6 @@ pihole_dir: "/opt/pihole"
 pihole_config_dir: "/opt/pihole/etc-pihole"
 
 pihole_admin_host: "pihole.{{ base_domain }}"
-
 pihole_upstream_dns: "1.1.1.1;1.0.0.1"
 
 # -----------------------------------------------------------------------------
@@ -64,3 +64,22 @@ wg_easy_dir: "/opt/wg-easy"
 wg_easy_config_dir: "/volume1/docker/wireguard/Config"
 
 wg_easy_admin_host: "wireguard.{{ base_domain }}"
+
+# -----------------------------------------------------------------------------
+# Vikunja
+# -----------------------------------------------------------------------------
+
+vikunja_image: "vikunja/vikunja:latest"
+vikunja_postgres_image: "postgres:18"
+vikunja_ip: "172.30.0.5"
+
+vikunja_dir: "/opt/vikunja"
+vikunja_files_dir: "{{ vikunja_dir }}/files"
+vikunja_db_dir: "{{ vikunja_dir }}/db"
+
+vikunja_host: "todo.{{ base_domain }}"
+vikunja_public_url: "http://{{ vikunja_host }}/"
+vikunja_registration_enabled: true
+
+vikunja_db_name: "vikunja"
+vikunja_db_user: "vikunja"

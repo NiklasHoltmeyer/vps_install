@@ -7,7 +7,6 @@ services:
       - "--providers.docker=true"
       - "--providers.docker.exposedbydefault=false"
       - "--providers.docker.network={{ traefik_network }}"
-
       - "--entrypoints.web.address=:80"
 
     volumes:

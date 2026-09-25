@@ -34,13 +34,10 @@ services:
 
     labels:
       - "traefik.enable=true"
-
       - "traefik.http.routers.wireguard.rule=Host(`{{ wg_easy_admin_host }}`)"
       - "traefik.http.routers.wireguard.entrypoints=web"
       - "traefik.http.routers.wireguard.service=wireguard"
-
       - "traefik.http.services.wireguard.loadbalancer.server.port={{ wg_easy_web_port }}"
-
       - "traefik.docker.network={{ traefik_network }}"
 
 networks:
