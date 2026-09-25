@@ -1,0 +1,59 @@
+---
+- name: Render deployment templates for CI
+  hosts: localhost
+  connection: local
+  gather_facts: true
+
+  vars_files:
+    - ../group_vars/all/vars.yml
+
+  vars:
+    pihole_password: "ci-dummy-password"
+    vikunja_db_password: "ci-dummy-password"
+    vikunja_service_secret: "ci-dummy-service-secret"
+    render_dir: "/tmp/vps-install-rendered"
+
+    render_templates:
+      - src: "{{ playbook_dir }}/../roles/traefik/templates/compose.yaml.j2"
+        dest: traefik-compose.yaml
+      - src: "{{ playbook_dir }}/../roles/pihole/templates/compose.yaml.j2"
+        dest: pihole-compose.yaml
+      - src: "{{ playbook_dir }}/../roles/wg_easy/templates/compose.yaml.j2"
+        dest: wg-easy-compose.yaml
+      - src: "{{ playbook_dir }}/../roles/vikunja/templates/compose.yaml.j2"
+        dest: vikunja-compose.yaml
+      - src: "{{ playbook_dir }}/../roles/homepage/templates/compose.yaml.j2"
+        dest: homepage-compose.yaml
+      - src: "{{ playbook_dir }}/../roles/homepage/templates/services.yaml.j2"
+        dest: homepage-services.yaml
+      - src: "{{ playbook_dir }}/../roles/homepage/templates/settings.yaml.j2"
+        dest: homepage-settings.yaml
+      - src: "{{ playbook_dir }}/../roles/homepage/templates/widgets.yaml.j2"
+        dest: homepage-widgets.yaml
+      - src: "{{ playbook_dir }}/../roles/homepage/templates/bookmarks.yaml.j2"
+        dest: homepage-bookmarks.yaml
+      - src: "{{ playbook_dir }}/../roles/homepage/templates/docker.yaml.j2"
+        dest: homepage-docker.yaml
+      - src: "{{ playbook_dir }}/../roles/homepage/templates/kubernetes.yaml.j2"
+        dest: homepage-kubernetes.yaml
+
+  tasks:
+    - name: Recreate render directory
+      ansible.builtin.file:
+        path: "{{ render_dir }}"
+        state: absent
+
+    - name: Create render directory
+      ansible.builtin.file:
+        path: "{{ render_dir }}"
+        state: directory
+        mode: "0700"
+
+    - name: Render templates
+      ansible.builtin.template:
+        src: "{{ item.src }}"
+        dest: "{{ render_dir }}/{{ item.dest }}"
+        mode: "0600"
+      loop: "{{ render_templates }}"
+      loop_control:
+        label: "{{ item.dest }}"

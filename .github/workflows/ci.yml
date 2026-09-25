@@ -1,0 +1,140 @@
+---
+name: CI
+
+on:
+  pull_request:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  lint:
+    name: YAML and Ansible lint
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+
+      - name: Set up Python
+        uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97 # v7.0.0
+        with:
+          python-version: "3.13"
+          cache: pip
+          cache-dependency-path: .github/ci-requirements.txt
+
+      - name: Install CI dependencies
+        run: python -m pip install --requirement .github/ci-requirements.txt
+
+      - name: Install Ansible collections
+        run: ansible-galaxy collection install --requirements-file ansible/requirements.yml
+
+      - name: Lint YAML
+        run: yamllint --config-file .yamllint .
+
+      - name: Lint Ansible
+        run: ansible-lint --config-file .ansible-lint ansible/
+
+  render:
+    name: Render and validate configuration
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+
+      - name: Set up Python
+        uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97 # v7.0.0
+        with:
+          python-version: "3.13"
+          cache: pip
+          cache-dependency-path: .github/ci-requirements.txt
+
+      - name: Install CI dependencies
+        run: python -m pip install --requirement .github/ci-requirements.txt
+
+      - name: Install Ansible collections
+        run: ansible-galaxy collection install --requirements-file ansible/requirements.yml
+
+      - name: Check Ansible syntax
+        working-directory: ansible
+        run: >-
+          ansible-playbook
+          --inventory inventory/hosts.ini
+          site.yml
+          --syntax-check
+          --extra-vars pihole_password=ci-dummy
+          --extra-vars vikunja_db_password=ci-dummy
+          --extra-vars vikunja_service_secret=ci-dummy
+
+      - name: Render Jinja templates with dummy secrets
+        run: >-
+          ansible-playbook
+          --inventory localhost,
+          --connection local
+          ansible/ci/render-templates.yml
+
+      - name: Validate rendered YAML
+        run: yamllint --config-file .yamllint /tmp/vps-install-rendered/*.yaml
+
+      - name: Validate rendered Docker Compose files
+        shell: bash
+        run: |
+          set -euo pipefail
+          for file in /tmp/vps-install-rendered/*-compose.yaml; do
+            echo "Validating ${file}"
+            docker compose --file "${file}" config --quiet
+          done
+
+      - name: Test Docker health helper
+        run: |
+          python -m py_compile ansible/roles/homepage/files/docker-health.py
+          python ansible/roles/homepage/files/docker-health.py /tmp/docker-status.json
+          python -m json.tool /tmp/docker-status.json >/dev/null
+
+  security:
+    name: Security scans
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+
+    steps:
+      - name: Checkout full history
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+
+      - name: Scan Git history for secrets with Gitleaks
+        shell: bash
+        run: |
+          docker run --rm \
+            --user "$(id -u):$(id -g)" \
+            --volume "$PWD:/repo:ro" \
+            ghcr.io/gitleaks/gitleaks:v8.29.1@sha256:aa036a2f4bdfe3cc3c55fa4326308efabb4a6be498c883c864fd1d0d5585438a \
+            detect --source=/repo --redact --no-banner
+
+      - name: Scan repository for secrets and IaC misconfigurations with Trivy
+        shell: bash
+        run: |
+          docker run --rm \
+            --volume "$PWD:/src:ro" \
+            ghcr.io/aquasecurity/trivy:0.74.0@sha256:62b1e65e8869bc4b4c6aa4fa2b21595256c7c2f6018a9d9ad61caf87187c1969 \
+            fs \
+            --scanners misconfig,secret \
+            --severity HIGH,CRITICAL \
+            --exit-code 1 \
+            /src

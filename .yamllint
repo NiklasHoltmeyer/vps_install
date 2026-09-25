@@ -1,0 +1,23 @@
+---
+extends: default
+
+ignore: |
+  ansible/roles/*/templates/*.j2
+
+rules:
+  line-length:
+    max: 180
+    level: warning
+  comments:
+    min-spaces-from-content: 1
+  comments-indentation: disable
+  braces:
+    max-spaces-inside: 1
+  octal-values:
+    forbid-implicit-octal: true
+    forbid-explicit-octal: true
+  truthy:
+    allowed-values:
+      - "true"
+      - "false"
+    check-keys: false
