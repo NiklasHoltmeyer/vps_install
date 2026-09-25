@@ -9,3 +9,4 @@
     - role: pihole
     - role: wg_easy
     - role: vikunja
+    - role: homepage

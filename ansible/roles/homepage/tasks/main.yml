@@ -1,0 +1,75 @@
+---
+- name: Homepage Verzeichnisse anlegen
+  ansible.builtin.file:
+    path: "{{ item }}"
+    state: directory
+    owner: "{{ homepage_puid }}"
+    group: "{{ homepage_pgid }}"
+    mode: "0755"
+  loop:
+    - "{{ homepage_dir }}"
+    - "{{ homepage_config_dir }}"
+    - "{{ homepage_status_dir }}"
+
+- name: Homepage Compose-Datei erstellen
+  ansible.builtin.template:
+    src: compose.yaml.j2
+    dest: "{{ homepage_dir }}/compose.yaml"
+    mode: "0644"
+
+- name: Homepage Konfiguration erstellen
+  ansible.builtin.template:
+    src: "{{ item }}.j2"
+    dest: "{{ homepage_config_dir }}/{{ item }}"
+    owner: "{{ homepage_puid }}"
+    group: "{{ homepage_pgid }}"
+    mode: "0644"
+  loop:
+    - services.yaml
+    - settings.yaml
+    - widgets.yaml
+    - bookmarks.yaml
+    - docker.yaml
+    - kubernetes.yaml
+
+- name: Docker-Health-Skript installieren
+  ansible.builtin.copy:
+    src: docker-health.py
+    dest: /usr/local/bin/homepage-docker-health
+    owner: root
+    group: root
+    mode: "0755"
+
+- name: Docker-Health systemd Unit installieren
+  ansible.builtin.template:
+    src: homepage-docker-health.service.j2
+    dest: /etc/systemd/system/homepage-docker-health.service
+    mode: "0644"
+  notify: systemd neu laden
+
+- name: Docker-Health systemd Timer installieren
+  ansible.builtin.template:
+    src: homepage-docker-health.timer.j2
+    dest: /etc/systemd/system/homepage-docker-health.timer
+    mode: "0644"
+  notify: systemd neu laden
+
+- name: systemd Handler vor Timer-Start ausführen
+  ansible.builtin.meta: flush_handlers
+
+- name: Docker-Health Status initial erzeugen
+  ansible.builtin.command:
+    cmd: "/usr/local/bin/homepage-docker-health {{ homepage_status_dir }}/status.json"
+  changed_when: false
+
+- name: Docker-Health Timer aktivieren und starten
+  ansible.builtin.systemd:
+    name: homepage-docker-health.timer
+    enabled: true
+    state: started
+
+- name: Homepage starten
+  community.docker.docker_compose_v2:
+    project_src: "{{ homepage_dir }}"
+    state: present
+    pull: missing

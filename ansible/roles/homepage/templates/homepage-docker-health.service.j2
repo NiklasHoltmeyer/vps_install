@@ -1,0 +1,17 @@
+[Unit]
+Description=Generate sanitized Docker health data for Homepage
+After=docker.service
+Requires=docker.service
+
+[Service]
+Type=oneshot
+User=root
+Group=root
+ExecStart=/usr/local/bin/homepage-docker-health {{ homepage_status_dir }}/status.json
+Nice=10
+NoNewPrivileges=true
+PrivateTmp=true
+PrivateDevices=true
+ProtectHome=true
+ProtectSystem=strict
+ReadWritePaths={{ homepage_status_dir }}
