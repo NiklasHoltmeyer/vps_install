@@ -1,6 +1,6 @@
 # VPS Setup
 
-Dokumentation und Ansible-Konfiguration für einen Ubuntu-VPS mit Docker, Traefik, WireGuard und Pi-hole.
+Dokumentation und Ansible-Konfiguration für einen Ubuntu-VPS mit Docker, Traefik, WireGuard, Pi-hole und Vikunja.
 
 ## Dokumentation
 
@@ -13,6 +13,9 @@ Die vollständige Übersicht befindet sich unter [`docs/README.md`](docs/README.
 3. [Ansible und Ansible Vault einrichten](docs/ansible/install-ansible.md)
 4. [WireGuard-Clients einrichten](docs/wireguard/configure-client.md)
 5. [Pi-hole einrichten und prüfen](docs/pihole/configure-pihole.md)
+6. [Vikunja einrichten und prüfen](docs/vikunja/configure-vikunja.md)
+
+Die zentrale Übersicht aller Dienste und Zugriffe befindet sich unter [`docs/services.md`](docs/services.md).
 
 ### Lokale Umgebung
 
@@ -34,7 +37,11 @@ Kurzanleitung: [`docs/wireguard/configure-client.md`](docs/wireguard/configure-c
 │   │       └── vars.yml
 │   ├── inventory/
 │   ├── roles/
-│   ├── templates/
+│   │   ├── base/
+│   │   ├── pihole/
+│   │   ├── traefik/
+│   │   ├── vikunja/
+│   │   └── wg_easy/
 │   ├── ansible.cfg
 │   ├── requirements.yml
 │   └── site.yml
@@ -44,8 +51,11 @@ Kurzanleitung: [`docs/wireguard/configure-client.md`](docs/wireguard/configure-c
 │   ├── pihole/
 │   ├── provider/
 │   ├── ubuntu/
+│   ├── vikunja/
 │   ├── windows-wsl/
-│   └── wireguard/
+│   ├── wireguard/
+│   ├── services.md
+│   └── README.md
 │
 ├── .gitattributes
 ├── .gitignore
@@ -54,7 +64,7 @@ Kurzanleitung: [`docs/wireguard/configure-client.md`](docs/wireguard/configure-c
 
 ## Ansible
 
-Die Serverkonfiguration liegt unter [`ansible/`](ansible/).
+Die Serverkonfiguration liegt unter [`ansible/`](ansible/). `site.yml` orchestriert die einzelnen Rollen; jeder Dienst hält seine Tasks und Compose-Templates in seiner eigenen Rolle.
 
 Vor der ersten Ausführung müssen Ansible Vault und die lokalen Secrets eingerichtet werden.
 

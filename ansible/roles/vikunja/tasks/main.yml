@@ -1,0 +1,28 @@
+---
+- name: Vikunja Basis- und Datenbankverzeichnis anlegen
+  ansible.builtin.file:
+    path: "{{ item }}"
+    state: directory
+    mode: "0755"
+  loop:
+    - "{{ vikunja_dir }}"
+    - "{{ vikunja_db_dir }}"
+
+- name: Vikunja Dateiverzeichnis mit passenden Rechten anlegen
+  ansible.builtin.file:
+    path: "{{ vikunja_files_dir }}"
+    state: directory
+    owner: "1000"
+    mode: "0755"
+
+- name: Vikunja Compose-Datei erstellen
+  ansible.builtin.template:
+    src: compose.yaml.j2
+    dest: "{{ vikunja_dir }}/compose.yaml"
+    mode: "0600"
+
+- name: Vikunja starten
+  community.docker.docker_compose_v2:
+    project_src: "{{ vikunja_dir }}"
+    state: present
+    pull: missing

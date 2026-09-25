@@ -1,2 +1,124 @@
 ---
-# tasks file for roles/base
+# -----------------------------------------------------------------------------
+# System
+# -----------------------------------------------------------------------------
+
+- name: Paketlisten aktualisieren
+  ansible.builtin.apt:
+    update_cache: true
+
+- name: System aktualisieren
+  ansible.builtin.apt:
+    upgrade: dist
+
+- name: Generic Linux Kernel installieren
+  ansible.builtin.apt:
+    name: linux-generic
+    state: present
+
+- name: Basis-Pakete installieren
+  ansible.builtin.apt:
+    name:
+      - git
+      - curl
+      - htop
+      - nano
+      - vim
+      - ca-certificates
+    state: present
+
+- name: Fail2ban installieren
+  ansible.builtin.apt:
+    name: fail2ban
+    state: present
+
+- name: Fail2ban starten und aktivieren
+  ansible.builtin.systemd:
+    name: fail2ban
+    state: started
+    enabled: true
+
+# -----------------------------------------------------------------------------
+# Docker
+# -----------------------------------------------------------------------------
+
+- name: Docker Keyring-Verzeichnis anlegen
+  ansible.builtin.file:
+    path: /etc/apt/keyrings
+    state: directory
+    mode: "0755"
+
+- name: Docker GPG-Key herunterladen
+  ansible.builtin.get_url:
+    url: https://download.docker.com/linux/ubuntu/gpg
+    dest: /etc/apt/keyrings/docker.asc
+    mode: "0644"
+
+- name: Docker Repository hinzufügen
+  ansible.builtin.apt_repository:
+    repo: >-
+      deb [arch={{ ansible_facts['architecture'] | replace('x86_64', 'amd64') }}
+      signed-by=/etc/apt/keyrings/docker.asc]
+      https://download.docker.com/linux/ubuntu
+      {{ ansible_facts['distribution_release'] }} stable
+    filename: docker
+    state: present
+
+- name: Docker installieren
+  ansible.builtin.apt:
+    name:
+      - docker-ce
+      - docker-ce-cli
+      - containerd.io
+      - docker-buildx-plugin
+      - docker-compose-plugin
+    state: present
+    update_cache: true
+
+- name: Docker starten und aktivieren
+  ansible.builtin.systemd:
+    name: docker
+    state: started
+    enabled: true
+
+- name: Gemeinsames Traefik Docker-Netzwerk anlegen
+  community.docker.docker_network:
+    name: "{{ traefik_network }}"
+    ipam_config:
+      - subnet: "{{ traefik_network_subnet }}"
+    state: present
+
+# -----------------------------------------------------------------------------
+# Firewall
+# -----------------------------------------------------------------------------
+
+- name: UFW installieren
+  ansible.builtin.apt:
+    name: ufw
+    state: present
+
+- name: SSH erlauben
+  community.general.ufw:
+    rule: allow
+    port: "22"
+    proto: tcp
+
+- name: WireGuard erlauben
+  community.general.ufw:
+    rule: allow
+    port: "{{ wg_easy_port }}"
+    proto: udp
+
+- name: Eingehenden Traffic standardmäßig blockieren
+  community.general.ufw:
+    direction: incoming
+    policy: deny
+
+- name: Ausgehenden Traffic standardmäßig erlauben
+  community.general.ufw:
+    direction: outgoing
+    policy: allow
+
+- name: UFW aktivieren
+  community.general.ufw:
+    state: enabled
