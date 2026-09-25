@@ -4,7 +4,7 @@
 # -----------------------------------------------------------------------------
 
 # Auf einem normalen VPS ist dies die öffentliche IPv4 am Default-Interface.
-server_ip: "{{ ansible_default_ipv4.address }}"
+server_ip: "{{ ansible_facts['default_ipv4']['address'] }}"
 base_domain: "home.arpa"
 
 # Gemeinsames internes Docker-Netz für Traefik, Pi-hole und wg-easy.
