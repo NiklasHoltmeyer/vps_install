@@ -1,0 +1,5 @@
+---
+profile: basic
+exclude_paths:
+  - ansible/roles/base/tests/
+  - ansible/ci/rendered/

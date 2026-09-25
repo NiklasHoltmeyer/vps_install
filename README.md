@@ -24,6 +24,12 @@ Nach Verbindung mit WireGuard ist das zentrale Dashboard erreichbar unter:
 http://dashboard.home.arpa
 ```
 
+### CI
+
+GitHub Actions prüft Pull Requests und Pushes auf `main` automatisch auf YAML-/Ansible-Fehler, nicht renderbare Templates, ungültige Docker-Compose-Konfigurationen, Secrets und sicherheitsrelevante Fehlkonfigurationen. Es findet bewusst kein automatisches Deployment statt.
+
+Details: [`docs/ci.md`](docs/ci.md)
+
 ### Lokale Umgebung
 
 - [Docker unter WSL installieren](docs/windows-wsl/install-docker.md)
@@ -38,7 +44,14 @@ Kurzanleitung: [`docs/wireguard/configure-client.md`](docs/wireguard/configure-c
 
 ```text
 .
+├── .github/
+│   ├── workflows/
+│   │   └── ci.yml
+│   ├── ci-requirements.txt
+│   └── dependabot.yml
 ├── ansible/
+│   ├── ci/
+│   │   └── render-templates.yml
 │   ├── group_vars/
 │   │   └── all/
 │   │       └── vars.yml
@@ -63,11 +76,14 @@ Kurzanleitung: [`docs/wireguard/configure-client.md`](docs/wireguard/configure-c
 │   ├── vikunja/
 │   ├── windows-wsl/
 │   ├── wireguard/
+│   ├── ci.md
 │   ├── services.md
 │   └── README.md
 │
+├── .ansible-lint
 ├── .gitattributes
 ├── .gitignore
+├── .yamllint
 └── README.md
 ```
 

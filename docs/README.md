@@ -41,6 +41,11 @@
 - [`homepage/configure-homepage.md`](homepage/configure-homepage.md)  
   Zentrales Homepage-Dashboard, Web-UI-Links und sicheren Docker-Systemstatus prüfen.
 
+## CI
+
+- [`ci.md`](ci.md)  
+  GitHub-Actions-Pipeline, Template-Rendering, Compose-Validierung und Security-Scans.
+
 ## Dienste
 
 - [`services.md`](services.md)  
@@ -73,6 +78,7 @@ docs/
 │   └── install-docker.md
 ├── wireguard/
 │   └── configure-client.md
+├── ci.md
 ├── services.md
 └── README.md
 ```
