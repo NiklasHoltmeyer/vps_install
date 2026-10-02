@@ -78,4 +78,4 @@ sudo docker compose up -d
 sudo docker compose ps
 ```
 
-Nach einem Restore `http://todo.home.arpa` öffnen und Aufgaben, Projekte und Anhänge prüfen.
+Nach einem Restore `http://todo` öffnen und Aufgaben, Projekte und Anhänge prüfen. `http://todo.home.arpa` bleibt als Alias ebenfalls verfügbar.
