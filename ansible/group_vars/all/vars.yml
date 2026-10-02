@@ -77,7 +77,10 @@ vikunja_dir: "/opt/vikunja"
 vikunja_files_dir: "{{ vikunja_dir }}/files"
 vikunja_db_dir: "{{ vikunja_dir }}/db"
 
-vikunja_host: "todo.{{ base_domain }}"
+# Single-Label-Hostname für lokale iOS-Clients wie mDone über WireGuard.
+vikunja_host: "todo"
+# Bisherigen FQDN als Alias beibehalten, damit bestehende Browser-Links weiter funktionieren.
+vikunja_legacy_host: "todo.{{ base_domain }}"
 vikunja_public_url: "http://{{ vikunja_host }}/"
 vikunja_registration_enabled: true
 

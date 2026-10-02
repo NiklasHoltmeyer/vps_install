@@ -29,7 +29,7 @@ services:
 
     labels:
       - "traefik.enable=true"
-      - "traefik.http.routers.vikunja.rule=Host(`{{ vikunja_host }}`)"
+      - "traefik.http.routers.vikunja.rule=Host(`{{ vikunja_host }}`) || Host(`{{ vikunja_legacy_host }}`)"
       - "traefik.http.routers.vikunja.entrypoints=web"
       - "traefik.http.routers.vikunja.service=vikunja"
       - "traefik.http.services.vikunja.loadbalancer.server.port=3456"
