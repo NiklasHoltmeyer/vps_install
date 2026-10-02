@@ -29,7 +29,7 @@ docker logs vikunja-db --tail 100
 Mit aktivem WireGuard-Tunnel auf dem Client:
 
 ```powershell
-nslookup todo.home.arpa
+nslookup todo
 ```
 
 Erwartete Adresse:
@@ -38,15 +38,17 @@ Erwartete Adresse:
 172.30.0.2
 ```
 
+Der bisherige Name `todo.home.arpa` bleibt zusätzlich als Alias erhalten und zeigt ebenfalls auf `172.30.0.2`.
+
 ## 3. Weboberfläche öffnen
 
 WireGuard verbinden und danach öffnen:
 
 ```text
-http://todo.home.arpa
+http://todo
 ```
 
-Vikunja selbst lauscht intern auf Port `3456`; dieser Port wird nicht auf dem VPS veröffentlicht. Traefik übernimmt den Zugriff über `todo.home.arpa`.
+Vikunja selbst lauscht intern auf Port `3456`; dieser Port wird nicht auf dem VPS veröffentlicht. Traefik übernimmt den Zugriff über `todo` und weiterhin zusätzlich über `todo.home.arpa`.
 
 ## 4. Ersten Benutzer anlegen
 
@@ -71,17 +73,21 @@ cd ~/vps_install/ansible
 ansible-playbook -i inventory/hosts.ini site.yml --vault-password-file ~/.ansible/vault-password
 ```
 
-## 5. iPhone / Client
+## 5. iPhone / mDone / Client
 
 Als Server-URL verwenden:
 
 ```text
-http://todo.home.arpa/
+http://todo
 ```
 
-Der WireGuard-Tunnel muss aktiv sein, weil Vikunja nicht öffentlich freigegeben wird.
+Der Single-Label-Hostname ist für lokale iOS-Clients wie mDone vorgesehen. Der WireGuard-Tunnel muss aktiv sein, weil Vikunja nicht öffentlich freigegeben wird.
 
-Falls ein iOS-Client ausschließlich HTTPS akzeptiert, muss später eine HTTPS-Konfiguration mit einer kontrollierten Domain oder einem auf dem iPhone vertrauenswürdigen Zertifikat ergänzt werden. Für den Browserzugriff innerhalb des VPNs reicht die aktuelle interne HTTP-Konfiguration.
+Für bestehende Browser-Lesezeichen funktioniert weiterhin:
+
+```text
+http://todo.home.arpa
+```
 
 ## 6. Aktualisieren
 
